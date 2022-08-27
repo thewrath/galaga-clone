@@ -1,5 +1,7 @@
 # Clone of Galaga
 
+![preview](https://raw.githubusercontent.com/thewrath/galaga-clone/main/assets/preview.png)
+
 # Development server
 This template provides ability to run development server on port 3000 to do so run `npm start` in the terminal 
 then open a browser and navigate to `http://127.0.0.1:3000`.
