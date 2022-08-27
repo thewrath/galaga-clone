@@ -1,13 +1,11 @@
 'use strict';
 
 import { Sprite } from 'black-engine';
-import { Movement } from '../movement/Movement';
 
 export class Enemy extends Sprite {
   
   /**
    * @param {string} image 
-   * @param {Movement} movement 
    */
   constructor(image) {
     super(image);

@@ -31,9 +31,6 @@ export class ShootComponent extends Component {
             for (const collider of this.bulletColliders) {
                 if (this.__checkCollision(collider, b)) {
                     b.alive = false;
-                    if (!collider.alive) {
-                        this.bulletColliders = this.bulletColliders.filter(c => c !== collider);
-                    }
                     this.post('~bulletCollide', collider);
                     break;
                 }
@@ -51,8 +48,12 @@ export class ShootComponent extends Component {
         this.post('~shoot', bullet);
     }
 
-    registerBulletCollider(collider) {
+    addBulletCollider(collider) {
         this.bulletColliders.push(collider);
+    }
+
+    removeBulletCollider(collider) {
+        this.bulletColliders = this.bulletColliders.filter(c => c !== collider);
     }
 
     _isBulletOutOfScreen(bullet) {

@@ -14,7 +14,7 @@ export class LifeComponent extends Component {
         } 
     }
 
-    hit() {
+    decrease() {
         if (this.mLives > 0) {
             this.mLives -= 1;
         }

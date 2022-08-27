@@ -2,11 +2,10 @@
 
 import './utils/math';
 
-import { Black, AssetManager, BlendMode, GameObject, InputComponent } from 'black-engine';
+import { Black, AssetManager, BlendMode, GameObject, InputComponent, DisplayObject } from 'black-engine';
 import { Player } from './displayObject/Player';
 import { EnemyState } from './displayObject/Enemy';
 import { StarBackground } from './displayObject/StarBackground';
-import { EnemyFactory } from './factory/EnemyFactory';
 
 import alien from '/assets/textures/alien1.png';
 import alienLeader from '/assets/textures/alien9.png';
@@ -15,6 +14,8 @@ import bullet from '/assets/textures/bullet.png';
 import star from '/assets/textures/star.png';
 import { ShootComponent } from './components/ShootComponent';
 import { HUD } from './displayObject/HUD';
+import { LifeComponent } from './components/LifeComponent';
+import { spawnLevel } from './level/levels';
 
 export class Game extends GameObject {
   constructor() {
@@ -30,8 +31,6 @@ export class Game extends GameObject {
     assets.on('complete', this.onAssetsLoaded, this);
 
     assets.loadQueue();
-
-    this.mEnemyFactory = new EnemyFactory();
   }
 
   onAssetsLoaded(m) {
@@ -40,17 +39,40 @@ export class Game extends GameObject {
     this.add(new StarBackground());
 
     this.player = this.addChild(new Player('player'));
+    
+    // Player bullet collision with enemies
     this.player.on('bulletCollide', (msg, collider) => {
       collider.state = EnemyState.DIE;
+      this.player.getComponent(ShootComponent).removeBulletCollider(collider);
     }, this);
 
     this.player.scaleX = 4;
     this.player.scaleY = 4;
 
-    this.mEnemyFactory.spawnWave(1).forEach((e) => {
-      this.player.getComponent(ShootComponent).registerBulletCollider(e);
-      this.addChild(e)
+    ///////// Level
+    const level = spawnLevel(0);
+
+    this.enemies = new GameObject();
+    [...level.leaders, ...level.enemies].forEach((e) => {
+      this.player.getComponent(ShootComponent).addBulletCollider(e);
+      
+      const shootComponent = e.getComponent(ShootComponent);
+      if (shootComponent) {
+        shootComponent.addBulletCollider(this.player);
+      }
+
+      this.enemies.addChild(e);
     });
+
+    this.addChild(this.enemies);
+
+    this.enemies.on('bulletCollide', (msg, collider) => {
+      this.player.getComponent(LifeComponent).decrease();
+      this.player.getComponent(ShootComponent).removeBulletCollider(collider);
+    }, this);
+
+    //////// Level
+
 
     this.hud = this.addChild(new HUD(this.player));
     
@@ -67,7 +89,7 @@ export class Game extends GameObject {
 
   onUpdate() {
     for (const c of this.mChildren) {
-      typeof c.accept === 'function' && c.accept(this.hud);
+      typeof c.accept === 'function' && this.hud && c.accept(this.hud);
     }
   }
 

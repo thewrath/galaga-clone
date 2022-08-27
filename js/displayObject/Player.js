@@ -33,7 +33,6 @@ export class Player extends Sprite {
 
       // Increase score when bullet collide
       this.on('bulletCollide', () => {
-        this.getComponent(LifeComponent).hit(); 
         this.mScore += 100;
       }, this);
 
@@ -49,9 +48,10 @@ export class Player extends Sprite {
     }
 
     onShoot(event, bullet) {
-        this.parent.addChild(bullet);
-        bullet.x = this.x;
-        bullet.y = this.y;
+      this.parent.addChild(bullet);
+      bullet.x = this.x;
+      bullet.y = this.y;
+      this.on('die', () => bullet.removeFromParent(), this);
     }
 
     onRemoveBullets(event, bullets) {

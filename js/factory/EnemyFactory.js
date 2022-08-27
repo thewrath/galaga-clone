@@ -18,7 +18,7 @@ const COL_GAP = 25;
 
 export class EnemyFactory {
 
-    createLeader(x, y, r, c, offset={x: 0, y: 0}) {
+    static createLeader(x, y, r, c, offset={x: 0, y: 0}) {
         const enemy = new Enemy('alien');
         enemy.x = x;
         enemy.y = y;
@@ -26,12 +26,14 @@ export class EnemyFactory {
         enemy.scaleY = 4;
         enemy.texture = Black.assets.getTexture('alienLeader');
 
-        const behaviorOchestrator = new SequentialBehaviorOchestrator(); 
+        const behaviorOchestrator = new SequentialBehaviorOchestrator();
+
         behaviorOchestrator.registerBehaviorSet(
             new LeaderMovementBehavior( 
                 (new Chain())
-                .push((new Loop(null))
-                .push(new CircularMovement(10, {x: x, y: y}, 200, false, 0))
+                .push(
+                    (new Loop(null))
+                        .push(new CircularMovement(10, {x: x, y: y}, 200, false, 0))
             )),
             new NothingDetachBehavior(),
             'move'
@@ -64,7 +66,7 @@ export class EnemyFactory {
         return enemy;
     }
 
-    createEnemyRow(leader, cols, rowIndex=0, offset={x: 0, y: 0}) {
+    static createEnemyRow(leader, cols, rowIndex=0, offset={x: 0, y: 0}) {
         let previousEnemy = leader;
     
         const enemies = [];
@@ -102,11 +104,5 @@ export class EnemyFactory {
         }
             
         return enemies;
-    }
-
-    spawnWave(waveNumber) {
-        const offset = {x: 200, y: 200};
-        const leader = this.createLeader(550, 550, 0, 0, offset);
-        return [leader, ...this.createEnemyRow(leader, 4, 1, offset)];
     }
 }
